@@ -45,11 +45,10 @@ class App extends Component {
             types: [{type: {name: type}}]
           } = json;
 
-          const pokemons = [...this.state.pokemons];
-          pokemons[pokemon.id - 1] = { ...pokemon, name, image, type };
-
-          this.setState({
-            pokemons
+          this.setState((prevState, props) => {
+            const pokemons = [...prevState.pokemons];
+            pokemons[pokemon.id - 1] = { ...pokemon, name, image, type };
+            return {pokemons};
           });
         })
     );
