@@ -7,26 +7,25 @@ class App extends Component {
     super(props);
     const numberOfPokemon = 50;
     const numbers = [...Array(numberOfPokemon).keys()].map(n => n + 1);
-    this.pokemons = numbers.map(number =>({
+    const pokemons = numbers.map(number =>({
         id: number,
         name: ''
       }));
     this.state = {
-      pokemons: this.pokemons,
+      pokemons,
       filter: ''
     };
   }
 
   handleFilterChange = query => {
     this.setState({
-      filter: query,
-      pokemons: this.filterPokemon(query)
+      filter: query
     });
   }
 
-  filterPokemon(query){
-    return this.pokemons.filter(
-      pokemon => pokemon.name.includes(query)
+  filterPokemon(){
+    return this.state.pokemons.filter(
+      pokemon => pokemon.name.includes(this.state.filter)
     )
   }
 
@@ -34,10 +33,11 @@ class App extends Component {
     const baseURL = 'http://pokeapi.co/api/v2/';
     const pokemonURL = num => `${baseURL}pokemon/${num}/`;
 
-    this.pokemons.map( pokemon =>
+    this.state.pokemons.map( pokemon =>
       fetch(pokemonURL(pokemon.id))
-      .then(response => {
-        response.json()
+        .then(response =>
+          response.json()
+        )
         .then(json => {
           const{
             name,
@@ -45,13 +45,13 @@ class App extends Component {
             types: [{type: {name: type}}]
           } = json;
 
-          this.pokemons[pokemon.id - 1] = { ...pokemon, name, image, type };
+          const pokemons = [...this.state.pokemons];
+          pokemons[pokemon.id - 1] = { ...pokemon, name, image, type };
 
           this.setState({
-            pokemons: this.filterPokemon(this.state.filter)
+            pokemons
           });
-        });
-      })
+        })
     );
   }
 
@@ -59,7 +59,7 @@ class App extends Component {
     return (
       <div>
         <Search onFilterChange={this.handleFilterChange} />
-        <PokemonList pokemons={this.state.pokemons} />
+        <PokemonList pokemons={this.filterPokemon()} />
       </div>
     );
   }
