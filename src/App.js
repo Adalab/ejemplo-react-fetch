@@ -6,7 +6,11 @@ class App extends Component {
   constructor(props){
     super(props);
     const numberOfPokemon = 50;
+
+    // Creamos un array de 50 elementos que van del 1 al 50: [1, 2, 3, ...50]
     const numbers = [...Array(numberOfPokemon).keys()].map(n => n + 1);
+
+    // Creamos un array de pokemons con id y name: [{id: 1, name: 'bulbasaur'}]
     const pokemons = numbers.map(number =>({
         id: number,
         name: ''
@@ -17,7 +21,7 @@ class App extends Component {
     };
   }
 
-  handleFilterChange = query => {
+  handleFilterChange(query) {
     this.setState({
       filter: query
     });
@@ -39,6 +43,7 @@ class App extends Component {
           response.json()
         )
         .then(json => {
+          // Esto es un destructuring, no un diccionario
           const{
             name,
             sprites: {front_default: image},
@@ -46,7 +51,11 @@ class App extends Component {
           } = json;
 
           this.setState((prevState, props) => {
+            // Esta linea genera una copia del array para no modificar prevState.pokemons directamente
             const pokemons = [...prevState.pokemons];
+
+            // Asignamos la info nueva (name, image...) y la anterior (...pokemons)
+            // al pokemon que está en la posicion id - 1 del array pokemons
             pokemons[pokemon.id - 1] = { ...pokemon, name, image, type };
             return {pokemons};
           });
@@ -57,7 +66,7 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Search onFilterChange={this.handleFilterChange} />
+        <Search onFilterChange={this.handleFilterChange.bind(this)} />
         <PokemonList pokemons={this.filterPokemon()} />
       </div>
     );
